@@ -1,0 +1,2 @@
+# trackerplatz
+ncurses program inspired by 65daysofstatic's [music video](https://www.youtube.com/watch?v=l73eDjbpPzA). this program is incredibly not finished, and might even have memory leaks. who knows?
