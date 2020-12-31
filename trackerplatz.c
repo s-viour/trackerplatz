@@ -95,6 +95,14 @@ int main(int argc, char* argv[]) {
 	ticker1 = NULL;
 	aco_destroy(ticker2);
 	ticker2 = NULL;
+	aco_destroy(falling_ascii1);
+	falling_ascii1 = NULL;
+	aco_destroy(falling_ascii2);
+	falling_ascii2 = NULL;
+	aco_destroy(falling_ascii3);
+	falling_ascii3 = NULL;
+	aco_destroy(falling_ascii4);
+	falling_ascii4 = NULL;
 
     aco_share_stack_destroy(sstk);
     sstk = NULL;
