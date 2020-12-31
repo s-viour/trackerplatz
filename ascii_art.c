@@ -31,7 +31,7 @@ void free_ascii_art(AsciiArt* art) {
 
 void draw_ascii_art(AsciiArt* art) {
 	for (int i = 0; i < art->lines->count - 1; ++i) {
-		mvprintw(5 + i, 12, art->lines->lines[i]);
+		mvprintw(10 + i, 20, art->lines->lines[i]);
 		msleep(100);
 		refresh();
 	}

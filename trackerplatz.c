@@ -14,6 +14,8 @@ void draw_bars(int);
 
 void ticker();
 
+void falling_ascii();
+
 void trackerplatz_init();
 
 typedef struct TickerArgs {
@@ -21,6 +23,10 @@ typedef struct TickerArgs {
 	char* text;
 } TickerArgs;
 
+typedef struct FallingAsciiArgs {
+	int xpos_start;
+	int xpos_end;
+} FallingAsciiArgs;
 
 int main(int argc, char* argv[]) {
 	// load all the necessary files into strings
@@ -43,7 +49,6 @@ int main(int argc, char* argv[]) {
 	
 
 	trackerplatz_init();
-	
 	msleep(500);
 	draw_ascii_art(art1);
 	msleep(2000);
@@ -55,16 +60,31 @@ int main(int argc, char* argv[]) {
 	clear_main_screen();
 	msleep(100);
 	draw_ascii_art(art3);
+	
 
 	
 	TickerArgs ticker1_args = {1, ticker_text};
 	TickerArgs ticker2_args = {LINES - 2, ticker_text};
+	FallingAsciiArgs falling_ascii_args1 = {1, 7};
+	FallingAsciiArgs falling_ascii_args2 = {COLS - 8, COLS - 2};
+
+
 	aco_t* ticker1 = aco_create(main_co, sstk, 0, ticker, &ticker1_args);
 	aco_t* ticker2 = aco_create(main_co, sstk, 0, ticker, &ticker2_args);
+	aco_t* falling_ascii1 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1);
+	aco_t* falling_ascii2 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1);
+	aco_t* falling_ascii3 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2);
+	aco_t* falling_ascii4 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2);
 
 	while (true) {
 		aco_resume(ticker1);
 		aco_resume(ticker2);
+		aco_resume(falling_ascii1);
+		aco_resume(falling_ascii2);
+		aco_resume(falling_ascii3);
+		aco_resume(falling_ascii4);
+		refresh();
+		msleep(6);
 	}
 	
 	
@@ -165,9 +185,43 @@ void ticker() {
 
 
 		mvprintw(ypos, 0, linebuffer);
-		refresh();
-		msleep(7);
 		++state;
 		aco_yield();
+	}
+}
+
+void falling_ascii() {
+	FallingAsciiArgs* args = aco_get_arg();
+	int xpos_start = args->xpos_start;
+	int xpos_end = args->xpos_end;
+	float ypos_star;
+	int xpos_star;
+	float speed;
+
+	while (true) {
+		ypos_star = 6;
+		xpos_star = rand() % (xpos_start - xpos_end + 1) + xpos_start;
+
+		speed = (float)rand()/(float)(RAND_MAX/0.5) + 0.1;
+		Point clear_start = {xpos_star, 4};
+		Rect clear = {clear_start, 1, LINES - 8};
+
+		while (ypos_star < LINES - 5) {
+			clear_rect(&clear);
+
+			mvprintw(ypos_star, xpos_star, "*");
+			mvprintw(ypos_star - 1, xpos_star, "+");
+			mvprintw(ypos_star - 2, xpos_star, "@");
+
+			for (int i = ypos_star; i > ypos_star / 2; --i) {
+				if (rand() % 5 == 0) {
+					mvprintw(i, xpos_star, "/");
+				}
+			}
+
+			ypos_star += speed;
+			aco_yield();
+		}
+		clear_rect(&clear);
 	}
 }
