@@ -29,4 +29,8 @@ void clear_rect(const Rect*);
 
 void clear_main_screen();
 
+void draw_frame(const Rect*);
+
+void draw_bars(int);
+
 #endif

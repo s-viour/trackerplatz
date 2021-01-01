@@ -109,3 +109,34 @@ void clear_main_screen() {
     Rect main_rect = {main_point, COLS - 22, LINES - 8};
     clear_rect(&main_rect);
 }
+
+void draw_frame(const Rect* r) {
+    char* top_frame = generate_string(r->width, '*');
+    char* mid_frame = (char*)malloc(r->width * sizeof(char) + 1);
+    int i;
+
+    for (i = 1; i < r->width - 1; ++i) {
+        mid_frame[i] = ' ';
+    }
+    mid_frame[0] = '*';
+    mid_frame[r->width - 1] = '*';
+    mid_frame[r->width] = '\0';
+
+    mvprintw(r->start.y, r->start.x, top_frame);
+    for (i = r->start.y + 1; i < r->height - 1; ++i) {
+        mvprintw(i, r->start.x, mid_frame);
+    }
+    mvprintw(i, r->start.x, top_frame);
+
+    free(top_frame);
+    free(mid_frame);
+    refresh();
+}
+
+void draw_bars(int y) {
+    char* line = generate_string(COLS, '-');
+    mvprintw(y - 1, 0, line);
+    mvprintw(y + 1, 0, line);
+    free(line);
+    refresh();
+}

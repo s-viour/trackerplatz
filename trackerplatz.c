@@ -8,10 +8,6 @@
 #include "ascii_art.h"
 #include "util.h"
 
-void draw_frame(const Rect*);
-
-void draw_bars(int);
-
 void ticker();
 
 void falling_ascii();
@@ -47,38 +43,33 @@ int main(int argc, char* argv[]) {
 	aco_thread_init(NULL);
 	aco_t* main_co = aco_create(NULL, NULL, 0, NULL, NULL);
 	aco_share_stack_t* sstk = aco_share_stack_new(0);
-
-	
-
-	trackerplatz_init();
-	
-
 	
 	TickerArgs ticker1_args = {1, ticker_text};
 	TickerArgs ticker2_args = {LINES - 2, ticker_text};
 	FallingAsciiArgs falling_ascii_args1 = {1, 7};
 	FallingAsciiArgs falling_ascii_args2 = {COLS - 8, COLS - 2};
-
-
-	aco_t* ascii_art1 = aco_create(main_co, sstk, 0, draw_ascii_art_co, art1);
-	aco_t* ascii_art2 = aco_create(main_co, sstk, 0, draw_ascii_art_co, art2);
-	aco_t* ascii_art3 = aco_create(main_co, sstk, 0, draw_ascii_art_co, art3);
-	aco_t* ticker1 = aco_create(main_co, sstk, 0, ticker, &ticker1_args);
-	aco_t* ticker2 = aco_create(main_co, sstk, 0, ticker, &ticker2_args);
-	aco_t* falling_ascii1 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1);
-	aco_t* falling_ascii2 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1);
-	aco_t* falling_ascii3 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2);
-	aco_t* falling_ascii4 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2);
-	aco_t* routines[] = {
-		ticker1, ticker2, falling_ascii1, falling_ascii2,
-		falling_ascii3, falling_ascii4
+	
+	aco_t* ascii_art[] = {
+		aco_create(main_co, sstk, 0, draw_ascii_art_co, art1),
+		aco_create(main_co, sstk, 0, draw_ascii_art_co, art2),
+		aco_create(main_co, sstk, 0, draw_ascii_art_co, art3)
 	};
 
-	ascii_art_simul(ascii_art1, ticker1, ticker2);
-	clear_main_screen();
-	ascii_art_simul(ascii_art2, ticker1, ticker2);
-	clear_main_screen();
-	ascii_art_simul(ascii_art3, ticker1, ticker2);
+	aco_t* routines[] = {
+		aco_create(main_co, sstk, 0, ticker, &ticker1_args),
+		aco_create(main_co, sstk, 0, ticker, &ticker2_args),
+		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1),
+		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1),
+		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2),
+		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2)
+	};
+
+	trackerplatz_init();
+
+	for (int i = 0; i < 3; ++i) {
+		ascii_art_simul(ascii_art[i], routines[0], routines[1]);
+		clear_main_screen();
+	}
 
 	while (true) {
 		for (int i = 0; i < 6; ++i) {
@@ -88,23 +79,18 @@ int main(int argc, char* argv[]) {
 		msleep(10);
 	}
 
-	
-	
 
 	endwin();
 
-	aco_destroy(ticker1);
-	ticker1 = NULL;
-	aco_destroy(ticker2);
-	ticker2 = NULL;
-	aco_destroy(falling_ascii1);
-	falling_ascii1 = NULL;
-	aco_destroy(falling_ascii2);
-	falling_ascii2 = NULL;
-	aco_destroy(falling_ascii3);
-	falling_ascii3 = NULL;
-	aco_destroy(falling_ascii4);
-	falling_ascii4 = NULL;
+	for (int i = 0; i < 3; ++i) {
+		aco_destroy(ascii_art[i]);
+		ascii_art[i] = NULL;
+	}
+
+	for (int i = 0; i < 6; ++i) {
+		aco_destroy(routines[i]);
+		routines[i] = NULL;
+	}
 
     aco_share_stack_destroy(sstk);
     sstk = NULL;
@@ -165,37 +151,6 @@ void trackerplatz_init() {
 	msleep(500);
 	draw_frame(&frame3_r);
 	msleep(500);
-}
-
-void draw_frame(const Rect* r) {
-	char* top_frame = generate_string(r->width, '*');
-	char* mid_frame = (char*)malloc(r->width * sizeof(char) + 1);
-	int i;
-
-	for (i = 1; i < r->width - 1; ++i) {
-		mid_frame[i] = ' ';
-	}
-	mid_frame[0] = '*';
-	mid_frame[r->width - 1] = '*';
-	mid_frame[r->width] = '\0';
-
-	mvprintw(r->start.y, r->start.x, top_frame);
-	for (i = r->start.y + 1; i < r->height - 1; ++i) {
-		mvprintw(i, r->start.x, mid_frame);
-	}
-	mvprintw(i, r->start.x, top_frame);
-
-	free(top_frame);
-	free(mid_frame);
-	refresh();
-}
-
-void draw_bars(int y) {
-	char* line = generate_string(COLS, '-');
-	mvprintw(y - 1, 0, line);
-	mvprintw(y + 1, 0, line);
-	free(line);
-	refresh();
 }
 
 void ticker() {
