@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include "ascii_art.h"
 #include "util.h"
+#include "aco.h"
 
 AsciiArt* load_ascii_art(const char* filename) {
 	char* raw = load_text_file(filename);
@@ -28,11 +29,20 @@ void free_ascii_art(AsciiArt* art) {
 	art = NULL;
 }
 
-
 void draw_ascii_art(AsciiArt* art) {
 	for (int i = 0; i < art->lines->count - 1; ++i) {
 		mvprintw(10 + i, 20, art->lines->lines[i]);
 		msleep(100);
 		refresh();
 	}
+} 
+
+
+void draw_ascii_art_co() {
+	AsciiArt* art = aco_get_arg();
+	for (int i = 0; i < art->lines->count - 1; ++i) {
+		mvprintw(10 + i, 20, art->lines->lines[i]);
+		aco_yield();
+	}
+	aco_exit();
 }

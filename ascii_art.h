@@ -15,4 +15,6 @@ void free_ascii_art(AsciiArt*);
 
 void draw_ascii_art(AsciiArt*);
 
+void draw_ascii_art_co();
+
 #endif

@@ -18,6 +18,8 @@ void falling_ascii();
 
 void trackerplatz_init();
 
+void ascii_art_simul(aco_t*, aco_t*, aco_t*);
+
 typedef struct TickerArgs {
 	int ypos;
 	char* text;
@@ -49,17 +51,6 @@ int main(int argc, char* argv[]) {
 	
 
 	trackerplatz_init();
-	msleep(500);
-	draw_ascii_art(art1);
-	msleep(2000);
-	
-	clear_main_screen();
-	msleep(100);
-	draw_ascii_art(art2);
-	msleep(2000);
-	clear_main_screen();
-	msleep(100);
-	draw_ascii_art(art3);
 	
 
 	
@@ -69,23 +60,34 @@ int main(int argc, char* argv[]) {
 	FallingAsciiArgs falling_ascii_args2 = {COLS - 8, COLS - 2};
 
 
+	aco_t* ascii_art1 = aco_create(main_co, sstk, 0, draw_ascii_art_co, art1);
+	aco_t* ascii_art2 = aco_create(main_co, sstk, 0, draw_ascii_art_co, art2);
+	aco_t* ascii_art3 = aco_create(main_co, sstk, 0, draw_ascii_art_co, art3);
 	aco_t* ticker1 = aco_create(main_co, sstk, 0, ticker, &ticker1_args);
 	aco_t* ticker2 = aco_create(main_co, sstk, 0, ticker, &ticker2_args);
 	aco_t* falling_ascii1 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1);
 	aco_t* falling_ascii2 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1);
 	aco_t* falling_ascii3 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2);
 	aco_t* falling_ascii4 = aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2);
+	aco_t* routines[] = {
+		ticker1, ticker2, falling_ascii1, falling_ascii2,
+		falling_ascii3, falling_ascii4
+	};
+
+	ascii_art_simul(ascii_art1, ticker1, ticker2);
+	clear_main_screen();
+	ascii_art_simul(ascii_art2, ticker1, ticker2);
+	clear_main_screen();
+	ascii_art_simul(ascii_art3, ticker1, ticker2);
 
 	while (true) {
-		aco_resume(ticker1);
-		aco_resume(ticker2);
-		aco_resume(falling_ascii1);
-		aco_resume(falling_ascii2);
-		aco_resume(falling_ascii3);
-		aco_resume(falling_ascii4);
+		for (int i = 0; i < 6; ++i) {
+			aco_resume(routines[i]);
+		}
 		refresh();
-		msleep(6);
+		msleep(10);
 	}
+
 	
 	
 
@@ -119,6 +121,25 @@ int main(int argc, char* argv[]) {
 	free(ticker_text);
 	ticker_text = NULL;
 	return 0;
+}
+
+void ascii_art_simul(aco_t* ascii_art, aco_t* ticker1, aco_t* ticker2) {
+	while (!ascii_art->is_end) {
+		for (int i = 0; i < 10; ++i) {
+			aco_resume(ticker1);
+			aco_resume(ticker2);
+			refresh();
+			msleep(10);
+		}
+		aco_resume(ascii_art);
+	}
+
+	for (int i = 0; i < 300; ++i) {
+		aco_resume(ticker1);
+		aco_resume(ticker2);
+		refresh();
+		msleep(10);
+	}
 }
 
 void trackerplatz_init() {
