@@ -5,6 +5,9 @@
 #include "util.h"
 #include "aco.h"
 
+// an AsciiArt structure consists of a Lines struct
+// and a char* pointing to the raw data
+// this function loads and constructs one from a file
 AsciiArt* load_ascii_art(const char* filename) {
 	char* raw = load_text_file(filename);
 	Lines* lines = split_lines(raw);
@@ -16,6 +19,7 @@ AsciiArt* load_ascii_art(const char* filename) {
 	return art;
 }
 
+// properly frees the lines of an AsciiArt
 void free_ascii_art(AsciiArt* art) {
 	free(art->raw);
 	art->raw = NULL;
@@ -29,6 +33,7 @@ void free_ascii_art(AsciiArt* art) {
 	art = NULL;
 }
 
+// this is unused as of now
 void draw_ascii_art(AsciiArt* art) {
 	for (int i = 0; i < art->lines->count - 1; ++i) {
 		mvprintw(10 + i, 20, art->lines->lines[i]);
@@ -37,7 +42,7 @@ void draw_ascii_art(AsciiArt* art) {
 	}
 } 
 
-
+// coroutine version of drawing ascii art
 void draw_ascii_art_co() {
 	AsciiArt* art = aco_get_arg();
 	for (int i = 0; i < art->lines->count - 1; ++i) {

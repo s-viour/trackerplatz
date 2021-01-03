@@ -10,6 +10,8 @@ void msleep(unsigned msec) {
 	usleep(msec * 1000);
 }
 
+// generates a string of length size by repeating
+// the supplied character
 char* generate_string(int size, const char repeat) {
 	char* str = (char*)malloc(size * sizeof(char) + 1);
 	for (int i = 0; i < size; ++i) {
@@ -20,6 +22,9 @@ char* generate_string(int size, const char repeat) {
 	return str;
 }
 
+// opens a text file and returns a pointer
+// to the text content
+// if this fails, it'll just exit the program lol
 char* load_text_file(const char* filename) {
 	FILE* fp = NULL;
 
@@ -43,6 +48,8 @@ char* load_text_file(const char* filename) {
 
 // retrived from https://stackoverflow.com/questions/9210528/split-string-with-delimiters-in-c
 // copying code, i know ;p
+// returns a pointer to a Lines structure
+// that contains a char** of all the lines in a string
 Lines* split_lines(char* a_str)
 {
 	char a_delim = '\n';
@@ -93,6 +100,7 @@ Lines* split_lines(char* a_str)
     return s_lines;
 }
 
+// clears a space on the screen by printing whitespace
 void clear_rect(const Rect* r) {
     int i, j;
 
@@ -110,6 +118,7 @@ void clear_main_screen() {
     clear_rect(&main_rect);
 }
 
+// function responsible for drawing the boxes made of asterisks
 void draw_frame(const Rect* r) {
     char* top_frame = generate_string(r->width, '*');
     char* mid_frame = (char*)malloc(r->width * sizeof(char) + 1);
@@ -133,6 +142,8 @@ void draw_frame(const Rect* r) {
     refresh();
 }
 
+// function responsible for drawing the bars
+// made of dash-characters at the top and bottom of the screen
 void draw_bars(int y) {
     char* line = generate_string(COLS, '-');
     mvprintw(y - 1, 0, line);

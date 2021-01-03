@@ -6,55 +6,54 @@
 
 #include "aco.h"
 #include "ascii_art.h"
+#include "fx.h"
 #include "util.h"
-
-void ticker();
-
-void falling_ascii();
 
 void trackerplatz_init();
 
 void ascii_art_simul(aco_t*, aco_t*, aco_t*);
 
-typedef struct TickerArgs {
-	int ypos;
-	char* text;
-} TickerArgs;
-
-typedef struct FallingAsciiArgs {
-	int xpos_start;
-	int xpos_end;
-} FallingAsciiArgs;
 
 int main(int argc, char* argv[]) {
 	// load all the necessary files into strings
-	printf("TRACKERPLATZ INIT\n");
 	char* ticker_text = load_text_file("resources/ticker.txt");
 	AsciiArt* art1 = load_ascii_art("resources/65warez_proudly_presents.txt");
 	AsciiArt* art2 = load_ascii_art("resources/tracker_platz.txt");
 	AsciiArt* art3 = load_ascii_art("resources/65daysofstatic.txt");
 
 	
+	// initialize the screen, set the bg color to white on black,
+	// hide the cursor, and set the getch() timeout to 10ms
 	initscr();
 	start_color();
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 	curs_set(0);
+	timeout(10);
 
+	// initialize aco, and create the main coroutine and the shared stack
 	aco_thread_init(NULL);
 	aco_t* main_co = aco_create(NULL, NULL, 0, NULL, NULL);
 	aco_share_stack_t* sstk = aco_share_stack_new(0);
 	
+	// create the arguments to be supplied to the coroutines
+	// since aco only lets us pass one argument, we bundle
+	// them all into structures
 	TickerArgs ticker1_args = {1, ticker_text};
 	TickerArgs ticker2_args = {LINES - 2, ticker_text};
 	FallingAsciiArgs falling_ascii_args1 = {1, 7};
 	FallingAsciiArgs falling_ascii_args2 = {COLS - 8, COLS - 2};
 	
+	// array of the big ascii art coroutines
+	// we store these separately from the main routines because
+	// they don't get executed for the entire duration
 	aco_t* ascii_art[] = {
 		aco_create(main_co, sstk, 0, draw_ascii_art_co, art1),
 		aco_create(main_co, sstk, 0, draw_ascii_art_co, art2),
 		aco_create(main_co, sstk, 0, draw_ascii_art_co, art3)
 	};
 
+	// array of the main routines that run throughout the entire program
+	// we store them in the array so we can iterate over them
 	aco_t* routines[] = {
 		aco_create(main_co, sstk, 0, ticker, &ticker1_args),
 		aco_create(main_co, sstk, 0, ticker, &ticker2_args),
@@ -64,34 +63,49 @@ int main(int argc, char* argv[]) {
 		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2)
 	};
 
+	// draw the bars and frames
 	trackerplatz_init();
 
+	// ascii_art_simul is responsible for drwaing the ascii art
+	// while maintaining the scrolling text across the top and bottom
 	for (int i = 0; i < 3; ++i) {
 		ascii_art_simul(ascii_art[i], routines[0], routines[1]);
 		clear_main_screen();
 	}
 
+	// main loop of the program
+	// as of right now, this just runs forever until quit
 	while (true) {
+		// for every coroutine in the main routines array
+		// resume it
 		for (int i = 0; i < 6; ++i) {
 			aco_resume(routines[i]);
 		}
+		// after running each routine once, refresh and
+		// sleep for 10ms while waiting to see if we can quit
 		refresh();
-		msleep(10);
+		if (getch() == 'q') {
+			break;
+		}
 	}
 
 
+	// kill the ncurses window
 	endwin();
 
+	// deconstruct all the ascii art routines
 	for (int i = 0; i < 3; ++i) {
 		aco_destroy(ascii_art[i]);
 		ascii_art[i] = NULL;
 	}
 
+	// deconstruct all the main routines
 	for (int i = 0; i < 6; ++i) {
 		aco_destroy(routines[i]);
 		routines[i] = NULL;
 	}
 
+	// and free everything else
     aco_share_stack_destroy(sstk);
     sstk = NULL;
 
@@ -109,24 +123,6 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-void ascii_art_simul(aco_t* ascii_art, aco_t* ticker1, aco_t* ticker2) {
-	while (!ascii_art->is_end) {
-		for (int i = 0; i < 10; ++i) {
-			aco_resume(ticker1);
-			aco_resume(ticker2);
-			refresh();
-			msleep(10);
-		}
-		aco_resume(ascii_art);
-	}
-
-	for (int i = 0; i < 300; ++i) {
-		aco_resume(ticker1);
-		aco_resume(ticker2);
-		refresh();
-		msleep(10);
-	}
-}
 
 void trackerplatz_init() {
 	// draw the bars on the top and bottom
@@ -153,59 +149,29 @@ void trackerplatz_init() {
 	msleep(500);
 }
 
-void ticker() {
-	TickerArgs* arg = aco_get_arg();
-	int ypos = arg->ypos;
-	char* text = arg->text;
 
-	long long state = 0;
-	int textlen = strlen(text);
-
-	while (true) {
-		int start = state % textlen;
-
-		char linebuffer[COLS + 1];
-		strncpy(linebuffer, &text[start], COLS);
-
-
-		mvprintw(ypos, 0, linebuffer);
-		++state;
-		aco_yield();
-	}
-}
-
-void falling_ascii() {
-	FallingAsciiArgs* args = aco_get_arg();
-	int xpos_start = args->xpos_start;
-	int xpos_end = args->xpos_end;
-	float ypos_star;
-	int xpos_star;
-	float speed;
-
-	while (true) {
-		ypos_star = 6;
-		xpos_star = rand() % (xpos_start - xpos_end + 1) + xpos_start;
-
-		speed = (float)rand()/(float)(RAND_MAX/0.5) + 0.1;
-		Point clear_start = {xpos_star, 4};
-		Rect clear = {clear_start, 1, LINES - 8};
-
-		while (ypos_star < LINES - 5) {
-			clear_rect(&clear);
-
-			mvprintw(ypos_star, xpos_star, "*");
-			mvprintw(ypos_star - 1, xpos_star, "+");
-			mvprintw(ypos_star - 2, xpos_star, "@");
-
-			for (int i = ypos_star; i > ypos_star / 2; --i) {
-				if (rand() % 5 == 0) {
-					mvprintw(i, xpos_star, "/");
-				}
-			}
-
-			ypos_star += speed;
-			aco_yield();
+// responsible for drawing the ascii art while also making
+// sure the tickers keep running at a regular pace
+void ascii_art_simul(aco_t* ascii_art, aco_t* ticker1, aco_t* ticker2) {
+	while (!ascii_art->is_end) {
+		// this is done by resuming the tickers 10 times
+		// for every one resumption of the ascii art
+		for (int i = 0; i < 10; ++i) {
+			aco_resume(ticker1);
+			aco_resume(ticker2);
+			refresh();
+			msleep(10);
 		}
-		clear_rect(&clear);
+		aco_resume(ascii_art);
+		refresh();
+	}
+
+	// after finishing drawing the art
+	// tick for a little while longer to keep the art on the screen
+	for (int i = 0; i < 300; ++i) {
+		aco_resume(ticker1);
+		aco_resume(ticker2);
+		refresh();
+		msleep(10);
 	}
 }
