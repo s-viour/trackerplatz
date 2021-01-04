@@ -46,58 +46,32 @@ char* load_text_file(const char* filename) {
 	return str;
 }
 
-// retrived from https://stackoverflow.com/questions/9210528/split-string-with-delimiters-in-c
-// copying code, i know ;p
-// returns a pointer to a Lines structure
-// that contains a char** of all the lines in a string
+// splits a string into lines and
+// returns a Lines struct containing pointers to each line
 Lines* split_lines(char* a_str)
 {
-	char a_delim = '\n';
-    char** result    = 0;
-    size_t count     = 0;
-    char* tmp        = a_str;
-    char* last_comma = 0;
-    char delim[2];
-    delim[0] = a_delim;
-    delim[1] = 0;
-
-    /* Count how many elements will be extracted. */
-    while (*tmp)
-    {
-        if (a_delim == *tmp)
-        {
-            count++;
-            last_comma = tmp;
+	char* tmp = a_str;
+    int count = 1;
+    while (*tmp) {
+        if (*tmp == '\n') {
+            count += 1;
         }
-        tmp++;
+        ++tmp;
     }
 
-    /* Add space for trailing token. */
-    count += last_comma < (a_str + strlen(a_str) - 1);
-
-    /* Add space for terminating null string so caller
-       knows where the list of returned strings ends. */
-    count++;
-
-    result = malloc(sizeof(char*) * count);
-
-    if (result)
-    {
-        size_t idx  = 0;
-        char* token = strtok(a_str, delim);
-
-        while (token)
-        {
-            *(result + idx++) = strdup(token);
-            token = strtok(0, delim);
-        }
-        *(result + idx) = 0;
+    char** lines = malloc(count * sizeof(char*));
+    int i = 0;
+    char* tok_str = strtok(a_str, "\n");
+    while (tok_str != NULL) {
+        lines[i] = tok_str;
+        ++i;
+        tok_str = strtok(NULL, "\n");
     }
 
-    Lines* s_lines = malloc(sizeof(Lines));
-    s_lines->lines = result;
-    s_lines->count = count;
-    return s_lines;
+    Lines* l = malloc(sizeof(Lines));
+    l->lines = lines;
+    l->count = count;
+    return l;
 }
 
 // clears a space on the screen by printing whitespace

@@ -21,14 +21,15 @@ AsciiArt* load_ascii_art(const char* filename) {
 
 // properly frees the lines of an AsciiArt
 void free_ascii_art(AsciiArt* art) {
-	free(art->raw);
-	art->raw = NULL;
-	for (int i = 0; i < art->lines->count; ++i) {
-		free(art->lines->lines[i]);
-		art->lines->lines[i] = NULL;
-	}
+	free(art->lines->lines);
+	art->lines->lines = NULL;
+
 	free(art->lines);
 	art->lines = NULL;
+
+	free(art->raw);
+	art->raw = NULL;
+
 	free(art);
 	art = NULL;
 }

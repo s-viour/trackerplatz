@@ -113,11 +113,8 @@ int main(int argc, char* argv[]) {
     main_co = NULL;
 
 	free_ascii_art(art3);
-	art3 = NULL;
 	free_ascii_art(art2);
-	art2 = NULL;
 	free_ascii_art(art1);
-	art1 = NULL;
 	free(ticker_text);
 	ticker_text = NULL;
 	return 0;
