@@ -13,18 +13,23 @@ void ticker() {
 	TickerArgs* arg = aco_get_arg();
 	int ypos = arg->ypos;
 	char* text = arg->text;
-
-	long long state = 0;
 	int textlen = strlen(text);
+	int start = 0;
+	int end = 0;
+	int idx = 0;
+	long long state = 0;
 
 	while (true) {
-		int start = state % textlen;
+		start = state % textlen;
+		end = start + COLS;
 
-		char linebuffer[COLS + 1];
-		strncpy(linebuffer, &text[start], COLS);
+		idx = 0;
+		for (int i = start; i < end; ++i) {
+			mvaddch(ypos, idx, text[i % textlen]);
+			++idx;
+		}
 
-
-		mvprintw(ypos, 0, linebuffer);
+		
 		++state;
 		aco_yield();
 	}

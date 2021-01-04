@@ -52,6 +52,7 @@ int main(int argc, char* argv[]) {
 		aco_create(main_co, sstk, 0, draw_ascii_art_co, art3)
 	};
 
+
 	// array of the main routines that run throughout the entire program
 	// we store them in the array so we can iterate over them
 	aco_t* routines[] = {
@@ -66,15 +67,21 @@ int main(int argc, char* argv[]) {
 	// draw the bars and frames
 	trackerplatz_init();
 
+	
+	
 	// ascii_art_simul is responsible for drwaing the ascii art
 	// while maintaining the scrolling text across the top and bottom
 	for (int i = 0; i < 3; ++i) {
 		ascii_art_simul(ascii_art[i], routines[0], routines[1]);
 		clear_main_screen();
 	}
+	
+
+	
 
 	// main loop of the program
 	// as of right now, this just runs forever until quit
+	
 	while (true) {
 		// for every coroutine in the main routines array
 		// resume it
@@ -88,6 +95,8 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 	}
+	
+
 
 
 	// kill the ncurses window

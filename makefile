@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -lncurses -g -Wall -I./ -I./src
+CFLAGS = -O2 -lncurses -g -Wall -I./ -I./src
 SOURCES = src/trackerplatz.c src/util.c src/ascii_art.c src/fx.c
 
 all: trackerplatz
