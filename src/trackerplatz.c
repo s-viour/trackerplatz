@@ -9,6 +9,8 @@
 #include "fx.h"
 #include "util.h"
 
+static int QUIT = 0;
+
 void trackerplatz_init();
 
 void ascii_art_simul(aco_t*, aco_t*, aco_t*);
@@ -71,7 +73,7 @@ int main(int argc, char* argv[]) {
 	
 	// ascii_art_simul is responsible for drwaing the ascii art
 	// while maintaining the scrolling text across the top and bottom
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 3 && !QUIT; ++i) {
 		ascii_art_simul(ascii_art[i], routines[0], routines[1]);
 		clear_main_screen();
 	}
@@ -82,7 +84,7 @@ int main(int argc, char* argv[]) {
 	// main loop of the program
 	// as of right now, this just runs forever until quit
 	
-	while (true) {
+	while (!QUIT) {
 		// for every coroutine in the main routines array
 		// resume it
 		for (int i = 0; i < 6; ++i) {
@@ -92,7 +94,7 @@ int main(int argc, char* argv[]) {
 		// sleep for 10ms while waiting to see if we can quit
 		refresh();
 		if (getch() == 'q') {
-			break;
+			QUIT = 1;
 		}
 	}
 	
@@ -159,14 +161,18 @@ void trackerplatz_init() {
 // responsible for drawing the ascii art while also making
 // sure the tickers keep running at a regular pace
 void ascii_art_simul(aco_t* ascii_art, aco_t* ticker1, aco_t* ticker2) {
-	while (!ascii_art->is_end) {
+	while (!ascii_art->is_end && !QUIT) {
 		// this is done by resuming the tickers 10 times
 		// for every one resumption of the ascii art
 		for (int i = 0; i < 10; ++i) {
 			aco_resume(ticker1);
 			aco_resume(ticker2);
 			refresh();
-			msleep(10);
+			
+			if (getch() == 'q') {
+				QUIT = 1;
+				return;
+			}
 		}
 		aco_resume(ascii_art);
 		refresh();
@@ -178,6 +184,9 @@ void ascii_art_simul(aco_t* ascii_art, aco_t* ticker1, aco_t* ticker2) {
 		aco_resume(ticker1);
 		aco_resume(ticker2);
 		refresh();
-		msleep(10);
+		if (getch() == 'q') {
+			QUIT = 1;
+			return;
+		}
 	}
 }
