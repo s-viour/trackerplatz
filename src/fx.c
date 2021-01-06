@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
+#include <math.h>
 #include "aco.h"
 #include "util.h"
 
@@ -78,5 +79,55 @@ void falling_ascii() {
 			aco_yield();
 		}
 		clear_rect(&clear);
+	}
+}
+
+void draw_circle(char fill, Point* pos) {
+	// 2x2 square
+	mvaddch(pos->y, pos->x, fill);
+	mvaddch(pos->y, pos->x + 1, fill);
+	mvaddch(pos->y + 1, pos->x, fill);
+	mvaddch(pos->y + 1, pos->x + 1, fill);
+	mvaddch(pos->y + 2, pos->x, fill);
+	mvaddch(pos->y + 2, pos->x + 1, fill);
+	mvaddch(pos->y + 2, pos->x - 1, fill);
+	mvaddch(pos->y + 2, pos->x + 2, fill);
+
+
+	// right
+	mvaddch(pos->y, pos->x + 2, fill);
+	mvaddch(pos->y + 1, pos->x + 2, fill);
+	
+	// left
+	mvaddch(pos->y, pos->x - 1, fill);
+	mvaddch(pos->y + 1, pos->x - 1, fill);
+	
+}
+
+void orbit() {
+	OrbitArgs* arg = aco_get_arg();
+	double x_center = arg->x_center;
+	double y_center = arg->y_center;
+	double x = x_center;
+	double y = y_center;
+	int r = arg->radius;
+	char fill = arg->fill;
+	double t = arg->t_init;
+	double rads = 2 * M_PI;
+	Point p = {x, y};
+
+	while (true) {
+		draw_circle(' ', &p);
+		x = r * cos(t) + x_center;
+		y = r * sin(t) + y_center;
+		p.x = x;
+		p.y = y;
+		draw_circle(fill, &p);
+
+		if (t >= rads) {
+			t = 0;
+		}
+		t += 0.03;
+		aco_yield();
 	}
 }

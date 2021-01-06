@@ -92,6 +92,16 @@ void clear_main_screen() {
     clear_rect(&main_rect);
 }
 
+void fill_main_screen(char c) {
+    char* fill = generate_string((COLS - 22), '#');
+    for (int i = 4; i < LINES - 4; ++i) {
+        mvprintw(i, 11, fill);
+    }
+    free(fill);
+    fill = NULL;
+    refresh();
+}
+
 // function responsible for drawing the boxes made of asterisks
 void draw_frame(const Rect* r) {
     char* top_frame = generate_string(r->width, '*');
