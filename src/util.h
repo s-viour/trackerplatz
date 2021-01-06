@@ -33,4 +33,6 @@ void draw_frame(const Rect*);
 
 void draw_bars(int);
 
+void fill_main_screen(char c);
+
 #endif

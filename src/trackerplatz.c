@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include <unistd.h>
 #include <ncurses.h>
 
@@ -44,6 +45,8 @@ int main(int argc, char* argv[]) {
 	TickerArgs ticker2_args = {LINES - 2, ticker_text};
 	FallingAsciiArgs falling_ascii_args1 = {1, 7};
 	FallingAsciiArgs falling_ascii_args2 = {COLS - 8, COLS - 2};
+	OrbitArgs args1 = {COLS / 2, LINES / 2, M_PI, 15, '#'};
+	OrbitArgs args2 = {COLS / 2, LINES / 2, 0, 15, '#'};
 	
 	// array of the big ascii art coroutines
 	// we store these separately from the main routines because
@@ -63,12 +66,15 @@ int main(int argc, char* argv[]) {
 		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1),
 		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1),
 		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2),
-		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2)
+		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2),
+		aco_create(main_co, sstk, 0, orbit, &args1),
+		aco_create(main_co, sstk, 0, orbit, &args2)
 	};
 
 	// draw the bars and frames
 	trackerplatz_init();
 
+	
 	
 	
 	// ascii_art_simul is responsible for drwaing the ascii art
@@ -87,7 +93,7 @@ int main(int argc, char* argv[]) {
 	while (!QUIT) {
 		// for every coroutine in the main routines array
 		// resume it
-		for (int i = 0; i < 6; ++i) {
+		for (int i = 0; i < 8; ++i) {
 			aco_resume(routines[i]);
 		}
 		// after running each routine once, refresh and
@@ -111,7 +117,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// deconstruct all the main routines
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < 8; ++i) {
 		aco_destroy(routines[i]);
 		routines[i] = NULL;
 	}
