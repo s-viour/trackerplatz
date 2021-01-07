@@ -35,4 +35,6 @@ void draw_bars(int);
 
 void fill_main_screen(char c);
 
+void draw_line(Point*, Point*, char);
+
 #endif
