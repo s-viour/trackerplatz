@@ -108,21 +108,34 @@ void orbit() {
 	OrbitArgs* arg = aco_get_arg();
 	double x_center = arg->x_center;
 	double y_center = arg->y_center;
-	double x = x_center;
-	double y = y_center;
+
+	double x1 = x_center;
+	double y1 = y_center;
+	double x2 = x_center;
+	double y2 = y_center;
+
 	int r = arg->radius;
 	char fill = arg->fill;
 	double t = arg->t_init;
 	double rads = 2 * M_PI;
-	Point p = {x, y};
+	Point p1 = {x1, y1};
+	Point p2 = {x2, y2};
 
 	while (true) {
-		draw_circle(' ', &p);
-		x = r * cos(t) + x_center;
-		y = r * sin(t) + y_center;
-		p.x = x;
-		p.y = y;
-		draw_circle(fill, &p);
+		draw_line(&p1, &p2, ' ');
+		draw_circle(' ', &p1);
+		draw_circle(' ', &p2);
+		x1 = r * cos(t) + x_center;
+		y1 = r * sin(t) + y_center;
+		x2 = -r * cos(t) + x_center;
+		y2 = -r * sin(t) + y_center;
+		p1.x = x1;
+		p1.y = y1;
+		p2.x = x2;
+		p2.y = y2;
+		draw_line(&p1, &p2, 'X');
+		draw_circle(fill, &p1);
+		draw_circle(fill, &p2);
 
 		if (t >= rads) {
 			t = 0;
