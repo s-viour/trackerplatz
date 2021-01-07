@@ -75,14 +75,14 @@ int main(int argc, char* argv[]) {
 	
 	
 	
-	/*
+	
 	// ascii_art_simul is responsible for drwaing the ascii art
 	// while maintaining the scrolling text across the top and bottom
 	for (int i = 0; i < 3 && !QUIT; ++i) {
 		ascii_art_simul(ascii_art[i], routines[0], routines[1]);
 		clear_main_screen();
 	}
-	*/
+	
 	
 
 	
