@@ -100,8 +100,7 @@ void draw_circle(char fill, Point* pos) {
 	
 	// left
 	mvaddch(pos->y, pos->x - 1, fill);
-	mvaddch(pos->y + 1, pos->x - 1, fill);
-	
+	mvaddch(pos->y + 1, pos->x - 1, fill);	
 }
 
 void orbit() {

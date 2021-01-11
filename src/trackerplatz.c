@@ -18,13 +18,6 @@ void ascii_art_simul(aco_t*, aco_t*, aco_t*);
 
 
 int main(int argc, char* argv[]) {
-	// load all the necessary files into strings
-	char* ticker_text = load_text_file("resources/ticker.txt");
-	AsciiArt* art1 = load_ascii_art("resources/65warez_proudly_presents.txt");
-	AsciiArt* art2 = load_ascii_art("resources/tracker_platz.txt");
-	AsciiArt* art3 = load_ascii_art("resources/65daysofstatic.txt");
-
-	
 	// initialize the screen, set the bg color to white on black,
 	// hide the cursor, and set the getch() timeout to 10ms
 	initscr();
@@ -32,6 +25,13 @@ int main(int argc, char* argv[]) {
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 	curs_set(0);
 	timeout(10);
+
+	// load all the necessary files into strings
+	char* ticker_text = load_text_file("resources/ticker.txt");
+	AsciiArt* art1 = load_ascii_art("resources/65warez_proudly_presents.txt");
+	AsciiArt* art2 = load_ascii_art("resources/tracker_platz.txt");
+	AsciiArt* art3 = load_ascii_art("resources/65daysofstatic.txt");
+	Background* bg1 = load_background("resources/bg_joe.txt");
 
 	// initialize aco, and create the main coroutine and the shared stack
 	aco_thread_init(NULL);
@@ -72,6 +72,8 @@ int main(int argc, char* argv[]) {
 	// draw the bars and frames
 	trackerplatz_init();
 
+
+
 	
 	
 	
@@ -90,6 +92,7 @@ int main(int argc, char* argv[]) {
 	// main loop of the program
 	// as of right now, this just runs forever until quit
 	
+	draw_background(bg1);
 	while (!QUIT) {
 		// for every coroutine in the main routines array
 		// resume it
@@ -103,6 +106,7 @@ int main(int argc, char* argv[]) {
 			QUIT = 1;
 		}
 	}
+	
 
 	
 
@@ -130,6 +134,7 @@ int main(int argc, char* argv[]) {
     aco_destroy(main_co);
     main_co = NULL;
 
+    free_background(bg1);
 	free_ascii_art(art3);
 	free_ascii_art(art2);
 	free_ascii_art(art1);

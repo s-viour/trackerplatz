@@ -52,3 +52,49 @@ void draw_ascii_art_co() {
 	}
 	aco_exit();
 }
+
+Background* load_background(const char* filename) {
+	int width = COLS - 22;
+	int height = LINES - 8;
+	char* raw = load_text_file(filename);
+	char* cropped = malloc(width * height * sizeof(char) + 1);
+	cropped[width * height * sizeof(char)] = '\0';
+
+
+	int idx = 0;
+	int ridx = 0;
+	for (int j = 0; j < height; ++j) {
+		for (int i = 0; i < width; ++i) {
+			cropped[idx] = raw[ridx];
+			++idx;
+			++ridx;
+		}
+		ridx += 201 - width;
+	}
+
+	Background* bg = malloc(sizeof(Background));
+	bg->cropped = cropped;
+	free(raw);
+	raw = NULL;
+
+	return bg;
+}
+
+void free_background(Background* bg) {
+	free(bg->cropped);
+	bg->cropped = NULL;
+
+	free(bg);
+	bg = NULL;
+}
+
+void draw_background(Background* bg) {
+	int idx = 0;
+	
+	for (int y = 4; y < LINES - 4; ++y) {
+		for (int x = 11; x < COLS - 11; ++x) {
+			mvaddch(y, x, bg->cropped[idx]);
+			++idx;
+		}
+	}
+}
