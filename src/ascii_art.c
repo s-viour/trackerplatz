@@ -98,3 +98,19 @@ void draw_background(Background* bg) {
 		}
 	}
 }
+
+void change_backgrounds_co() {
+	ChangeBackgroundArgs* args = aco_get_arg();
+	int tick = 0;
+	int idx;
+	while (true) {
+		if (tick != 1000) {
+			++tick;
+		} else {
+			tick = 0;
+			idx = rand() % args->count;
+			draw_background(args->list[idx]);
+		}
+		aco_yield();
+	}
+}

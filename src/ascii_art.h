@@ -12,6 +12,11 @@ typedef struct Background {
 	char* cropped;
 } Background;
 
+typedef struct ChangeBackgroundArgs {
+	Background** list;
+	int count;
+} ChangeBackgroundArgs;
+
 
 AsciiArt* load_ascii_art(const char*);
 
@@ -26,5 +31,7 @@ Background* load_background(const char*);
 void draw_background(Background*);
 
 void free_background(Background*);
+
+void change_backgrounds_co();
 
 #endif

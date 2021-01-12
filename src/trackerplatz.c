@@ -32,6 +32,10 @@ int main(int argc, char* argv[]) {
 	AsciiArt* art2 = load_ascii_art("resources/tracker_platz.txt");
 	AsciiArt* art3 = load_ascii_art("resources/65daysofstatic.txt");
 	Background* bg1 = load_background("resources/bg_joe.txt");
+	Background* bg2 = load_background("resources/bg_si.txt");
+	Background* bg3 = load_background("resources/bg_abstract.txt");
+	Background* bg4 = load_background("resources/bg_corner.txt");
+	Background* bg5 = load_background("resources/bg_t.txt");
 
 	// initialize aco, and create the main coroutine and the shared stack
 	aco_thread_init(NULL);
@@ -45,7 +49,9 @@ int main(int argc, char* argv[]) {
 	TickerArgs ticker2_args = {LINES - 2, ticker_text};
 	FallingAsciiArgs falling_ascii_args1 = {1, 7};
 	FallingAsciiArgs falling_ascii_args2 = {COLS - 8, COLS - 2};
-	OrbitArgs args1 = {COLS / 2, LINES / 2, M_PI, 15, '#'};
+	OrbitArgs orbit_args1 = {COLS / 2, LINES / 2, M_PI, 15, '#'};
+	Background* bgs[] = {bg1, bg2, bg3, bg4, bg5};
+	ChangeBackgroundArgs change_background_args = {bgs, 5};
 	
 	// array of the big ascii art coroutines
 	// we store these separately from the main routines because
@@ -66,16 +72,12 @@ int main(int argc, char* argv[]) {
 		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args1),
 		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2),
 		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2),
-		aco_create(main_co, sstk, 0, orbit, &args1)
+		aco_create(main_co, sstk, 0, orbit, &orbit_args1),
+		aco_create(main_co, sstk, 0, change_backgrounds_co, &change_background_args)
 	};
 
 	// draw the bars and frames
 	trackerplatz_init();
-
-
-
-	
-	
 	
 	
 	// ascii_art_simul is responsible for drwaing the ascii art
@@ -85,18 +87,14 @@ int main(int argc, char* argv[]) {
 		clear_main_screen();
 	}
 	
-	
-
-	
 
 	// main loop of the program
 	// as of right now, this just runs forever until quit
-	
 	draw_background(bg1);
 	while (!QUIT) {
 		// for every coroutine in the main routines array
 		// resume it
-		for (int i = 0; i < 7; ++i) {
+		for (int i = 0; i < 8; ++i) {
 			aco_resume(routines[i]);
 		}
 		// after running each routine once, refresh and
@@ -108,10 +106,6 @@ int main(int argc, char* argv[]) {
 	}
 	
 
-	
-
-
-
 	// kill the ncurses window
 	endwin();
 
@@ -122,7 +116,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// deconstruct all the main routines
-	for (int i = 0; i < 7; ++i) {
+	for (int i = 0; i < 8; ++i) {
 		aco_destroy(routines[i]);
 		routines[i] = NULL;
 	}
