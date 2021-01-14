@@ -31,11 +31,13 @@ int main(int argc, char* argv[]) {
 	AsciiArt* art1 = load_ascii_art("resources/65warez_proudly_presents.txt");
 	AsciiArt* art2 = load_ascii_art("resources/tracker_platz.txt");
 	AsciiArt* art3 = load_ascii_art("resources/65daysofstatic.txt");
-	Background* bg1 = load_background("resources/bg_joe.txt");
-	Background* bg2 = load_background("resources/bg_si.txt");
-	Background* bg3 = load_background("resources/bg_abstract.txt");
-	Background* bg4 = load_background("resources/bg_corner.txt");
-	Background* bg5 = load_background("resources/bg_t.txt");
+	Background* bgs[] = {
+		load_background("resources/bg_joe.txt"),
+		load_background("resources/bg_si.txt"),
+		load_background("resources/bg_abstract.txt"),
+		load_background("resources/bg_corner.txt"),
+		load_background("resources/bg_t.txt")
+	};
 
 	// initialize aco, and create the main coroutine and the shared stack
 	aco_thread_init(NULL);
@@ -50,7 +52,6 @@ int main(int argc, char* argv[]) {
 	FallingAsciiArgs falling_ascii_args1 = {1, 7};
 	FallingAsciiArgs falling_ascii_args2 = {COLS - 8, COLS - 2};
 	OrbitArgs orbit_args1 = {COLS / 2, LINES / 2, M_PI, 15, '#'};
-	Background* bgs[] = {bg1, bg2, bg3, bg4, bg5};
 	ChangeBackgroundArgs change_background_args = {bgs, 5};
 	
 	// array of the big ascii art coroutines
@@ -90,7 +91,7 @@ int main(int argc, char* argv[]) {
 
 	// main loop of the program
 	// as of right now, this just runs forever until quit
-	draw_background(bg1);
+	draw_background(bgs[0]);
 	while (!QUIT) {
 		// for every coroutine in the main routines array
 		// resume it
@@ -128,7 +129,10 @@ int main(int argc, char* argv[]) {
     aco_destroy(main_co);
     main_co = NULL;
 
-    free_background(bg1);
+    for (int i = 0; i < 5; ++i) {
+    	free_background(bgs[i]);
+    	bgs[i] = NULL;
+    }
 	free_ascii_art(art3);
 	free_ascii_art(art2);
 	free_ascii_art(art1);
