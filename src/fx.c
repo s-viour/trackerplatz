@@ -132,7 +132,7 @@ void orbit() {
 		p1.y = y1;
 		p2.x = x2;
 		p2.y = y2;
-		draw_line(&p1, &p2, 'X');
+		draw_line(&p1, &p2, ' ');
 		draw_circle(fill, &p1);
 		draw_circle(fill, &p2);
 

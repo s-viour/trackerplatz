@@ -17,7 +17,7 @@ typedef struct OrbitArgs {
 	float t_init;
 	int radius;
 	char fill;
-} OrbitArgs;
+} OrbitArgs; 
 
 void ticker();
 
