@@ -10,6 +10,10 @@
 #include "fx.h"
 #include "util.h"
 
+#define NUM_BGS 5
+#define NUM_ROUTINES 8
+#define NUM_ART_ROUTINES 3
+
 static int QUIT = 0;
 
 void trackerplatz_init();
@@ -83,7 +87,7 @@ int main(int argc, char* argv[]) {
 	
 	// ascii_art_simul is responsible for drwaing the ascii art
 	// while maintaining the scrolling text across the top and bottom
-	for (int i = 0; i < 3 && !QUIT; ++i) {
+	for (int i = 0; i < NUM_ART_ROUTINES && !QUIT; ++i) {
 		ascii_art_simul(ascii_art[i], routines[0], routines[1]);
 		clear_main_screen();
 	}
@@ -95,7 +99,7 @@ int main(int argc, char* argv[]) {
 	while (!QUIT) {
 		// for every coroutine in the main routines array
 		// resume it
-		for (int i = 0; i < 8; ++i) {
+		for (int i = 0; i < NUM_ROUTINES; ++i) {
 			aco_resume(routines[i]);
 		}
 		// after running each routine once, refresh and
@@ -111,13 +115,13 @@ int main(int argc, char* argv[]) {
 	endwin();
 
 	// deconstruct all the ascii art routines
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < NUM_ART_ROUTINES; ++i) {
 		aco_destroy(ascii_art[i]);
 		ascii_art[i] = NULL;
 	}
 
 	// deconstruct all the main routines
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < NUM_ROUTINES; ++i) {
 		aco_destroy(routines[i]);
 		routines[i] = NULL;
 	}
@@ -129,7 +133,7 @@ int main(int argc, char* argv[]) {
     aco_destroy(main_co);
     main_co = NULL;
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < NUM_BGS; ++i) {
     	free_background(bgs[i]);
     	bgs[i] = NULL;
     }
