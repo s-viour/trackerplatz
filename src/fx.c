@@ -43,6 +43,7 @@ void falling_ascii() {
 	FallingAsciiArgs* args = aco_get_arg();
 	int xpos_start = args->xpos_start;
 	int xpos_end = args->xpos_end;
+	int color = args->color;
 	float ypos_star;
 	int xpos_star;
 	float speed;
@@ -64,6 +65,7 @@ void falling_ascii() {
 		while (ypos_star < LINES - 5) {
 			clear_rect(&clear);
 
+			attron(COLOR_PAIR(color));
 			mvprintw(ypos_star, xpos_star, "*");
 			mvprintw(ypos_star - 1, xpos_star, "+");
 			mvprintw(ypos_star - 2, xpos_star, "@");
@@ -76,6 +78,7 @@ void falling_ascii() {
 			}
 
 			ypos_star += speed;
+			attroff(COLOR_PAIR(color));
 			aco_yield();
 		}
 		clear_rect(&clear);

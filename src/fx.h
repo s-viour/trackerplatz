@@ -9,6 +9,7 @@ typedef struct TickerArgs {
 typedef struct FallingAsciiArgs {
 	int xpos_start;
 	int xpos_end;
+	int color;
 } FallingAsciiArgs;
 
 typedef struct OrbitArgs {
