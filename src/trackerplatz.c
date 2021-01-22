@@ -10,7 +10,7 @@
 #include "fx.h"
 #include "util.h"
 
-#define NUM_BGS 5
+#define NUM_BGS 6
 #define NUM_ROUTINES 8
 #define NUM_ART_ROUTINES 3
 
@@ -22,6 +22,10 @@ void ascii_art_simul(aco_t*, aco_t*, aco_t*);
 
 
 int main(int argc, char* argv[]) {
+	int skip_intro = 0;
+	if (argc == 2 && strcmp(argv[1], "--skip-intro") == 0) {
+		skip_intro = 1;
+	}
 	// initialize the screen, set the bg color to white on black,
 	// hide the cursor, and set the getch() timeout to 10ms
 	initscr();
@@ -37,6 +41,7 @@ int main(int argc, char* argv[]) {
 	AsciiArt* art2 = load_ascii_art("resources/tracker_platz.txt");
 	AsciiArt* art3 = load_ascii_art("resources/65daysofstatic.txt");
 	Background* bgs[] = {
+		load_background("resources/bg_orb.txt"),
 		load_background("resources/bg_joe.txt"),
 		load_background("resources/bg_si.txt"),
 		load_background("resources/bg_abstract.txt"),
@@ -85,12 +90,13 @@ int main(int argc, char* argv[]) {
 	// draw the bars and frames
 	trackerplatz_init();
 	
-	
-	// ascii_art_simul is responsible for drwaing the ascii art
-	// while maintaining the scrolling text across the top and bottom
-	for (int i = 0; i < NUM_ART_ROUTINES && !QUIT; ++i) {
-		ascii_art_simul(ascii_art[i], routines[0], routines[1]);
-		clear_main_screen();
+	if (!skip_intro) {
+		// ascii_art_simul is responsible for drwaing the ascii art
+		// while maintaining the scrolling text across the top and bottom
+		for (int i = 0; i < NUM_ART_ROUTINES && !QUIT; ++i) {
+			ascii_art_simul(ascii_art[i], routines[0], routines[1]);
+			clear_main_screen();
+		}
 	}
 	
 
