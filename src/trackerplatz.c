@@ -11,14 +11,19 @@
 #include "util.h"
 
 #define NUM_BGS 6
-#define NUM_ROUTINES 8
+#define NUM_ROUTINES 9
 #define NUM_ART_ROUTINES 3
 
-static int QUIT = 0;
+int QUIT = 0;
+Point ORB_LOCATIONS[6];
 
 void trackerplatz_init();
 
 void ascii_art_simul(aco_t*, aco_t*, aco_t*);
+
+void set_orblocs();
+
+void draw_lines();
 
 
 int main(int argc, char* argv[]) {
@@ -26,6 +31,7 @@ int main(int argc, char* argv[]) {
 	if (argc == 2 && strcmp(argv[1], "--skip-intro") == 0) {
 		skip_intro = 1;
 	}
+
 	// initialize the screen, set the bg color to white on black,
 	// hide the cursor, and set the getch() timeout to 10ms
 	initscr();
@@ -34,6 +40,7 @@ int main(int argc, char* argv[]) {
 	init_pair(2, COLOR_RED, COLOR_BLACK);
 	curs_set(0);
 	timeout(10);
+	
 
 	// load all the necessary files into strings
 	char* ticker_text = load_text_file("resources/ticker.txt");
@@ -85,6 +92,7 @@ int main(int argc, char* argv[]) {
 		aco_create(main_co, sstk, 0, falling_ascii, &falling_ascii_args2),
 		aco_create(main_co, sstk, 0, change_backgrounds_co, &change_background_args),
 		aco_create(main_co, sstk, 0, orbit, &orbit_args1),
+		aco_create(main_co, sstk, 0, draw_lines, NULL)
 	};
 
 	// draw the bars and frames
@@ -210,4 +218,32 @@ void ascii_art_simul(aco_t* ascii_art, aco_t* ticker1, aco_t* ticker2) {
 			return;
 		}
 	}
+}
+
+void set_orblocs() {
+	for (int i = 0; i < 6; ++i) {
+		Point p = {randint(15, COLS - 15), randint(15, LINES - 15)};
+		ORB_LOCATIONS[i] = p;
+	}
+}
+
+void draw_lines() {
+	int run = 0;
+	while (!QUIT) {
+		if (run == 250) {
+			run = 0;
+			set_orblocs();
+		}
+		for (int i = 0; i < 6; ++i) {
+			draw_circle(' ', &ORB_LOCATIONS[i]);
+		}
+		
+		for (int i = 1; i < 6; ++i) {
+			draw_line(&ORB_LOCATIONS[i], &ORB_LOCATIONS[i-1], ' ');
+		}
+		run += 1;
+		aco_yield();
+	}
+
+	aco_exit();
 }
