@@ -125,6 +125,9 @@ void orbit() {
 	Point p1 = {x1, y1};
 	Point p2 = {x2, y2};
 
+	int pick1 = randint(0, 5);
+	int pick2 = randint(0, 5);
+
 	while (true) {
 		draw_line(&p1, &p2, ' ');
 		draw_circle(' ', &p1);
@@ -141,12 +144,12 @@ void orbit() {
 		draw_circle(fill, &p1);
 		draw_circle(fill, &p2);
 
-		int pick1 = randint(0, 5);
-		int pick2 = randint(0, 5);
-		//draw_line(&p1, &ORB_LOCATIONS[pick1], ' ');
-		//draw_line(&p2, &ORB_LOCATIONS[pick2], ' ');
+		draw_line(&p1, &ORB_LOCATIONS[pick1], ' ');
+		draw_line(&p2, &ORB_LOCATIONS[pick2], ' ');
 
 		if (t >= rads) {
+			pick1 = randint(0, 5);
+			pick2 = randint(0, 5);
 			t = 0;
 		}
 		t += 0.03;

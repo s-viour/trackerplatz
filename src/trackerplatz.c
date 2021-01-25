@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
 
 	// initialize the screen, set the bg color to white on black,
 	// hide the cursor, and set the getch() timeout to 10ms
+	set_orblocs();
 	initscr();
 	start_color();
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
