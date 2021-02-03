@@ -107,6 +107,8 @@ void draw_circle(char fill, Point* pos) {
 }
 
 void orbit() {
+	extern Point ORB_LOCATIONS[6];
+
 	OrbitArgs* arg = aco_get_arg();
 	double x_center = arg->x_center;
 	double y_center = arg->y_center;
@@ -122,6 +124,9 @@ void orbit() {
 	double rads = 2 * M_PI;
 	Point p1 = {x1, y1};
 	Point p2 = {x2, y2};
+
+	int pick1 = randint(0, 5);
+	int pick2 = randint(0, 5);
 
 	while (true) {
 		draw_line(&p1, &p2, ' ');
@@ -139,7 +144,12 @@ void orbit() {
 		draw_circle(fill, &p1);
 		draw_circle(fill, &p2);
 
+		draw_line(&p1, &ORB_LOCATIONS[pick1], ' ');
+		draw_line(&p2, &ORB_LOCATIONS[pick2], ' ');
+
 		if (t >= rads) {
+			pick1 = randint(0, 5);
+			pick2 = randint(0, 5);
 			t = 0;
 		}
 		t += 0.03;

@@ -37,4 +37,6 @@ void fill_main_screen(char c);
 
 void draw_line(Point*, Point*, char);
 
+int randint(int, int);
+
 #endif
