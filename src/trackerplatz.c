@@ -112,6 +112,7 @@ int main(int argc, char* argv[]) {
 	// main loop of the program
 	// as of right now, this just runs forever until quit
 	draw_background(bgs[0]);
+	set_orblocs();
 	while (!QUIT) {
 		// for every coroutine in the main routines array
 		// resume it
@@ -222,8 +223,12 @@ void ascii_art_simul(aco_t* ascii_art, aco_t* ticker1, aco_t* ticker2) {
 }
 
 void set_orblocs() {
-	for (int i = 0; i < 6; ++i) {
-		Point p = {randint(15, COLS - 15), randint(15, LINES - 15)};
+	for (int i = 0; i < 3; ++i) {
+		Point p = {randint(15, COLS / 2 - 5), randint(15, LINES - 15)};
+		ORB_LOCATIONS[i] = p;
+	}
+	for (int i = 3; i < 6; ++i) {
+		Point p = {randint(COLS / 2 + 5, COLS - 15), randint(15, LINES - 15)};
 		ORB_LOCATIONS[i] = p;
 	}
 }
