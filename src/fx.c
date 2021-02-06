@@ -38,7 +38,6 @@ void ticker() {
 
 // function that handles drawing the falling asterisks and slashes
 // on the left and right frames
-// TODO: add color to this, so it can be red like in the video
 void falling_ascii() {
 	FallingAsciiArgs* args = aco_get_arg();
 	int xpos_start = args->xpos_start;
@@ -132,27 +131,31 @@ void orbit() {
 		draw_line(&p1, &p2, ' ');
 		draw_circle(' ', &p1);
 		draw_circle(' ', &p2);
+
 		x1 = r * cos(t) + x_center;
 		y1 = r * sin(t) + y_center;
 		x2 = -r * cos(t) + x_center;
 		y2 = -r * sin(t) + y_center;
+
 		p1.x = x1;
 		p1.y = y1;
 		p2.x = x2;
 		p2.y = y2;
+
 		draw_line(&p1, &p2, ' ');
 		draw_circle(fill, &p1);
 		draw_circle(fill, &p2);
-
+		
 		draw_line(&p1, &ORB_LOCATIONS[pick1], ' ');
 		draw_line(&p2, &ORB_LOCATIONS[pick2], ' ');
-
+		
 		if (t >= rads) {
 			pick1 = randint(0, 5);
 			pick2 = randint(0, 5);
 			t = 0;
 		}
 		t += 0.03;
+
 		aco_yield();
 	}
 }

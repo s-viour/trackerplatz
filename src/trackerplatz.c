@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 	init_pair(2, COLOR_RED, COLOR_BLACK);
 	curs_set(0);
-	timeout(10);
+	timeout(16);
 	
 
 	// load all the necessary files into strings
@@ -121,10 +121,12 @@ int main(int argc, char* argv[]) {
 		}
 		// after running each routine once, refresh and
 		// sleep for 10ms while waiting to see if we can quit
-		refresh();
+		// NOTE: GETCH DOES AN IMPLICIT REFRESH
+		// LOST MY MIND TRYING TO FIND THIS OUT
 		if (getch() == 'q') {
 			QUIT = 1;
 		}
+
 	}
 	
 
@@ -195,7 +197,7 @@ void ascii_art_simul(aco_t* ascii_art, aco_t* ticker1, aco_t* ticker2) {
 	while (!ascii_art->is_end && !QUIT) {
 		// this is done by resuming the tickers 10 times
 		// for every one resumption of the ascii art
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 6; ++i) {
 			aco_resume(ticker1);
 			aco_resume(ticker2);
 			refresh();
